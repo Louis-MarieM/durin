@@ -1,0 +1,14 @@
+# Fundamental image
+FROM python:3.13-slim
+
+# Configuration
+WORKDIR /durin
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Dependancies installation
+COPY requirements.dev.txt /durin/requirements.dev.txt
+RUN pip install --upgrade pip && pip install -r requirements.dev.txt
+
+COPY . /durin
+RUN pip install -e /durin/src

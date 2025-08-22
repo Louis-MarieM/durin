@@ -1,0 +1,20 @@
+services :
+  etl-pipeline:
+      build:
+        dockerfile: Dockerfile.dev
+      image: etl-pipeline-image:${VERSION}
+      container_name: etl-pipeline-container
+      restart: on-failure
+      environment:
+        LOG_LEVEL: ${LOG_LEVEL}
+      volumes:
+        - .:/durin:rw
+      ports:
+        - 5678:5678
+      networks:
+        - backend
+      command: python -m durin
+
+networks:
+  backend:
+    driver: bridge

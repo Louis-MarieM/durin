@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build ETL",
+            "type": "shell",
+            "command": "docker-compose -f docker-compose.dev.yml --env-file config/.env.dev up --build"
+        },
+        {
+            "label": "Run Tests",
+            "type": "shell",
+            "command": "docker-compose -f docker-compose.dev.yml --env-file config/.env.dev run --rm etl-pipeline pytest -q"
+        },
+        {
+            "label": "Run ETL with Debug",
+            "type": "shell",
+            "command": "docker-compose -f docker-compose.dev.yml --env-file config/.env.dev run --rm --service-ports etl-pipeline python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m durin"
+        },
+        {
+            "label": "Run Tests with Debug",
+            "type": "shell",
+            "command": "docker-compose -f docker-compose.dev.yml --env-file config/.env.dev run --rm --service-ports etl-pipeline python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m pytest -o log_cli=true -o log_cli_level=DEBUG -q"
+        }
+    ]
+}
