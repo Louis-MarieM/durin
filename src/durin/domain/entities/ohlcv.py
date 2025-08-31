@@ -31,7 +31,7 @@ class OHLCV:
     def __post_init__(self):
         self._validate_types()
         self._validate_timezones()
-        self._validate_bounds_and_relations()
+        self._validate_business_rules()
     
     def __eq__(self, other: object) -> bool:
         """Equality key = (ticker, period_start, interval)"""
@@ -87,12 +87,14 @@ class OHLCV:
         if self.loaded_at.tzinfo is None:
             raise ValidationException("loaded_at must be timezone-aware.", meta=base_meta)
 
-    def _validate_bounds_and_relations(self) -> None:
+    def _validate_business_rules(self) -> None:
         base_meta = _base_meta(self.ticker, self.period_start, self.loaded_at)
 
         max_price = max(self.open_price, self.low_price, self.close_price)
         min_price = min(self.open_price, self.high_price, self.close_price)
 
+        if not self.ticker or not self.ticker.strip():
+            raise InvalidOHLCVException("ticker must be a non-empty string.", meta={**base_meta})
         if self.high_price < max_price:
             raise InvalidOHLCVException("high_price inconsistent with open/low/close.", meta={**base_meta, "high_price": str(self.high_price), "max_price": str(max_price)})
         if self.low_price > min_price:

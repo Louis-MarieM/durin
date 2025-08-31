@@ -61,6 +61,12 @@ def test_init__when_timezone_not_valid__then_raises_ValidationException(_valid_o
 
 def test_init__when_high_price_not_max__then_raises_InvalidOHLCVException(_valid_ohlcv_fields):
     args = _valid_ohlcv_fields.copy()
+    args["ticker"] = "    "
+    with pytest.raises(InvalidOHLCVException):
+        OHLCV(**args)
+
+def test_init__when_high_price_not_max__then_raises_InvalidOHLCVException(_valid_ohlcv_fields):
+    args = _valid_ohlcv_fields.copy()
     args["close_price"] = Decimal("1000")
     with pytest.raises(InvalidOHLCVException):
         OHLCV(**args)
@@ -133,7 +139,7 @@ def test_lt__when_objects_too_differents__then_raises_NotImplemented(_valid_ohlc
     with pytest.raises(TypeError):
         obj_1 < obj_2
 
-def test_frozen__when_attempt_mutation__then_raises_exception(_valid_ohlcv_fields):
+def test_frozen__when_attempt_mutation__then_raises_FrozenInstanceError(_valid_ohlcv_fields):
     obj = OHLCV(**_valid_ohlcv_fields)
     with pytest.raises(FrozenInstanceError):
         obj.ticker = "MSFT"

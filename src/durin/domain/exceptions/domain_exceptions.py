@@ -19,6 +19,12 @@ class ValidationException(DomainException):
 class InvalidOHLCVException(ValidationException):
     """OHLCV invariants violated (inconsistent high/low/open/close)."""
 
+class InvalidPipelineException(ValidationException):
+    """Pipeline definition or step invariants violated (inconsistent name, version, number of step)."""
+
+class PipelineOperationNotPermitted(DomainException):
+    """Actual pipeline state don't permit the operation."""
+
 class DataConflictException(DomainException):
     """Conflict (duplicate/unique key)."""
 
