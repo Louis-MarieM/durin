@@ -19,9 +19,9 @@ class OHLCVDTO():
     low_price: Decimal
     close_price: Decimal
     period_start: datetime
-    interval: str
-    source: str
-    currency: str
+    interval: Interval
+    source: Source
+    currency: Currency
     loaded_at: Optional[datetime] = field(default_factory=lambda: datetime.now(timezone.utc))
     volume: Optional[Decimal] = None
     adjusted_close_price: Optional[Decimal] = None
@@ -43,9 +43,9 @@ class OHLCVDTO():
             low_price=self.low_price,
             close_price=self.close_price,
             period_start=self.period_start,
-            interval=Interval[self.interval],
-            source=Source[self.source],
-            currency=Currency[self.currency],
+            interval=self.interval,
+            source=self.source,
+            currency=self.currency,
             loaded_at=self.loaded_at or datetime.now(timezone.utc),
             volume=self.volume,
             adjusted_close_price=self.adjusted_close_price
@@ -66,12 +66,12 @@ class OHLCVDTO():
             raise ApplicationValidationException("close_price must be of type Decimal.", meta={**base_meta, "close_price_type": type(self.close_price)})
         if not isinstance(self.period_start, datetime):
             raise ApplicationValidationException("period_start must be of type datetime.", meta={**base_meta, "period_start_type": type(self.period_start)})
-        if not isinstance(self.interval, str):
-            raise ApplicationValidationException("interval must be of type str.", meta={**base_meta, "interval_type": type(self.interval)})
-        if not isinstance(self.source, str):
-            raise ApplicationValidationException("source must be of type str.", meta={**base_meta, "source_type": type(self.source)})
-        if not isinstance(self.currency, str):
-            raise ApplicationValidationException("currency must be of type str.", meta={**base_meta, "currency_type": type(self.currency)})
+        if not isinstance(self.interval, Interval):
+            raise ApplicationValidationException("interval must be of type Interval.", meta={**base_meta, "interval_type": type(self.interval)})
+        if not isinstance(self.source, Source):
+            raise ApplicationValidationException("source must be of type Source.", meta={**base_meta, "source_type": type(self.source)})
+        if not isinstance(self.currency, Currency):
+            raise ApplicationValidationException("currency must be of type Currency.", meta={**base_meta, "currency_type": type(self.currency)})
         if self.loaded_at is not None and not isinstance(self.loaded_at, datetime):
             raise ApplicationValidationException("loaded_at must be of type datetime.", meta={**base_meta, "loaded_at_type": type(self.loaded_at)})
         if self.volume is not None and not isinstance(self.volume, Decimal):

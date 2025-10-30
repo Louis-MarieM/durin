@@ -9,7 +9,9 @@ from durin.application import (
 )
 
 from durin.domain import (
-    OHLCV,
+    Currency,
+    Interval,
+    Source,
 )
 
 @pytest.fixture
@@ -22,9 +24,9 @@ def _valid_ohlcv_dto_fields() -> dict:
         low_price=Decimal("90"),
         close_price=Decimal("105"),
         period_start=start,
-        interval="1d",
-        source="Yahoo",
-        currency="usd",
+        interval=Interval.ONE_DAY,
+        source=Source.YAHOO,
+        currency=Currency.USD,
     )
 
 def test_init__when_valid_fields__then_creates_OHLCVDTO_instance(_valid_ohlcv_dto_fields):
@@ -38,8 +40,8 @@ def test_init__when_valid_fields__then_creates_OHLCVDTO_instance(_valid_ohlcv_dt
     ("low_price", 100),
     ("close_price", 100),
     ("period_start", "01/01/2025"),
-    ("interval", 100),
-    ("source", 100),
+    ("interval", "1d"),
+    ("source", "Yahoo"),
     ("currency", 100),
     ("loaded_at", "2025/01/01"),
     ("volume", 100),
