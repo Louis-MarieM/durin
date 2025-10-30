@@ -1,5 +1,5 @@
-from .entities.ohlcv import OHLCV
-from .entities.pipeline_definition import PipelineDefinition, PipelineStep
+from .models.ohlcv import OHLCV
+from .models.pipeline_definition import PipelineDefinition, PipelineStep
 from .exceptions.domain_exceptions import (
     DomainException,
     InvalidOHLCVException,
