@@ -75,7 +75,7 @@ If you are using VSCode as IDE :
 When you runned Durin or tests in debug mode, then run this configuration in `RUN AND DEBUG` section of VSCode to attach a client to container and trigger breakpoints.
 
 ## Logs
-Durin's logs are configured in [`logger.py`](src\durin\config\logger.py)
+Durin's logs are configured in [`logger.py`](/src/durin/config/logger.py)
 
 Tests's logs are locked by default. There are configured with theses options :
 ```
