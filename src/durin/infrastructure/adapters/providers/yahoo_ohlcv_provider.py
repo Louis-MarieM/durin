@@ -13,8 +13,8 @@ except:
 
 from ...exceptions.infrastructure_exceptions import InfrastructureException
 from durin.config.logger import logger
-from durin.domain import Currency, Interval, Source
-from durin.application import ApplicationException, OHLCVDTO
+from durin.domain import Currency, Interval, OHLCV, Source
+from durin.application import ApplicationException
 
 def _validate_inputs(ticker: str, start: datetime, end: datetime, interval: str) -> None:
     if not isinstance(ticker, str) or not ticker.strip():
@@ -25,9 +25,8 @@ def _validate_inputs(ticker: str, start: datetime, end: datetime, interval: str)
         raise InfrastructureException("start and end inputs must be timezone-aware datetimes.", meta={"ticker": ticker, "start": start, "end": end})
     if start >= end:
         raise InfrastructureException("start input must be earlier than end input.", meta={"ticker": ticker, "start": start, "end": end})
-    yahoo_allowed_interval = {"1m", "5m", "1h", "1d", "1wk", "1mo"}
-    if interval not in yahoo_allowed_interval:
-        raise InfrastructureException(f"interval input {interval} not supported by YFinance.", meta={"yahoo_allowed_interval": yahoo_allowed_interval})
+    if not Interval.from_str_to_enum(interval):
+        raise InfrastructureException(f"interval input {interval} not supported by YFinance.")
 
 def _to_decimal(value: Any) -> Decimal:
     if pd.isna(value):
@@ -49,15 +48,15 @@ class YahooOHLCVProvider:
         self.client = client or yf
         self.timeout = timeout
 
-    def fetch(self, ticker: str, start: datetime, end: datetime, interval: str, params: Optional[Mapping[str, Any]] = None) -> Iterable[OHLCVDTO]:
+    def fetch(self, ticker: str, start: datetime, end: datetime, interval: str, params: Optional[Mapping[str, Any]] = None) -> Iterable[OHLCV]:
         try:
             _validate_inputs(ticker, start, end, interval)
             for raw_row in self._call_yfinance(ticker, start, end, interval, adjust_price=False):
                 try:
-                    dto = self._raw_row_to_dto(raw_row, ticker, interval)
-                    yield dto
+                    ohlcv = self._from_raw_to_entities(raw_row, ticker, interval)
+                    yield ohlcv
                 except Exception as exception:
-                    logger.warning("Failed to convert raw Yahoo row to OHLCV DTO", exc_info=exception, extra={"ticker": ticker})
+                    logger.warning("Failed to convert raw Yahoo row to OHLCV", exc_info=exception, extra={"ticker": ticker})
                     continue
             return
         except InfrastructureException as infrastructure_exception:
@@ -65,7 +64,7 @@ class YahooOHLCVProvider:
         except Exception as exception:
             raise InfrastructureException("Unknown error.", meta={"ticker": ticker, "start": start, "end": end, "interval": interval, "exception": exception})
 
-    def _call_yfinance(self, ticker: str, start: datetime, end: datetime, interval: str, adjust_price: bool) -> Iterable[OHLCVDTO]:
+    def _call_yfinance(self, ticker: str, start: datetime, end: datetime, interval: str, adjust_price: bool) -> Iterable[OHLCV]:
         try:
             ticker_yf = self.client.Ticker(ticker)
             ticker_history_dataframe = ticker_yf.history(start=start, end=end, interval=interval, auto_adjust=adjust_price)
@@ -85,7 +84,7 @@ class YahooOHLCVProvider:
             # row.Index, row.Open, row.High...
             yield row
 
-    def _raw_row_to_dto(self, raw_row: dict, ticker: str, interval: str)-> OHLCVDTO:
+    def _from_raw_to_entities(self, raw_row: dict, ticker: str, interval: str)-> OHLCV:
         raw_open_price = getattr(raw_row, "Open", None)
         raw_high_price = getattr(raw_row, "High", None)
         raw_low_price = getattr(raw_row, "Low", None)
@@ -111,7 +110,7 @@ class YahooOHLCVProvider:
 
         loaded_at = datetime.now(timezone.utc)
 
-        return OHLCVDTO(
+        return OHLCV(
             ticker=ticker,
             open_price=open_price,
             high_price=high_price,
@@ -123,6 +122,5 @@ class YahooOHLCVProvider:
             currency=Currency.USD,
             loaded_at=loaded_at,
             volume=volume,
-            adjusted_close_price=adjusted_close_price,
-            meta=None
+            adjusted_close_price=adjusted_close_price
         )
