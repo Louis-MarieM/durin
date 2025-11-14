@@ -13,5 +13,3 @@ class ApplicationException(Exception):
     def to_dict(self) -> Dict[str, Any]:
         return {"error": self.error_code, "message": self.message, "meta": self.meta}
     
-class ApplicationValidationException(ApplicationException):
-    """Structural or format validation."""
