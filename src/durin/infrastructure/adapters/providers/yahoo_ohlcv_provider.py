@@ -14,7 +14,6 @@ except:
 from ...exceptions.infrastructure_exceptions import InfrastructureException
 from durin.config.logger import logger
 from durin.domain import Currency, Interval, OHLCV, Source
-from durin.application import ApplicationException
 
 def _validate_inputs(ticker: str, start: datetime, end: datetime, interval: str) -> None:
     if not isinstance(ticker, str) or not ticker.strip():
@@ -69,7 +68,7 @@ class YahooOHLCVProvider:
             ticker_yf = self.client.Ticker(ticker)
             ticker_history_dataframe = ticker_yf.history(start=start, end=end, interval=interval, auto_adjust=adjust_price)
         except Exception as exception:
-            raise ApplicationException("Yahoo finance service is unreachable or in error.", meta={"ticker": ticker, "start": start, "end": end, "interval": interval, "exception": exception})
+            raise InfrastructureException("Yahoo finance service is unreachable or in error.", meta={"ticker": ticker, "start": start, "end": end, "interval": interval, "exception": exception})
         
         if ticker_history_dataframe.empty:
             return
