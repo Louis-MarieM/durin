@@ -142,7 +142,7 @@ def test_update_steps__when_invalid_steps__then_raises_an_exception(_valid_pipel
     with pytest.raises(ValidationException):
         pipeline_definition.update_steps([new_pipeline_step, pipeline_step_args])
 
-def frozen__when_attempt_mutation__then_raises_FrozenInstanceError(_valid_pipeline_definition_fields):
+def test_frozen__when_attempt_mutation__then_raises_FrozenInstanceError(_valid_pipeline_definition_fields):
     obj = PipelineDefinition(**_valid_pipeline_definition_fields)
     with pytest.raises(FrozenInstanceError):
         obj.name = "Monthly ETL"
@@ -170,7 +170,7 @@ def test_init__when_step_runner_empty_string__then_raises_InvalidPipelineExcepti
     with pytest.raises(InvalidPipelineException):
         PipelineStep(**args)
 
-def frozen__when_attempt_mutation__then_raises_FrozenInstanceError(_valid_pipeline_step_fields):
+def test_frozen__when_attempt_mutation__then_raises_FrozenInstanceError(_valid_pipeline_step_fields):
     obj = PipelineStep(**_valid_pipeline_step_fields)
     with pytest.raises(FrozenInstanceError):
         obj.step_runner = "web_scrapper"
