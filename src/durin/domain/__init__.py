@@ -9,6 +9,7 @@ from .exceptions.domain_exceptions import (
 )
 from .value_objects.currency import Currency
 from .value_objects.interval import Interval
+from .value_objects.ohlcv_natural_key import compute_natural_key
 from .value_objects.pipeline_step_type import PipelineStepType
 from .value_objects.source import Source
 
@@ -18,6 +19,7 @@ __all__ = [
     "PipelineStep",
     "Currency",
     "Interval",
+    "compute_natural_key",
     "PipelineStepType",
     "Source",
     "DomainException",

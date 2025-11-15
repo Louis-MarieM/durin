@@ -8,6 +8,7 @@ from typing import Optional
 from ..exceptions.domain_exceptions import ValidationException, InvalidOHLCVException
 from ..value_objects.currency import Currency
 from ..value_objects.interval import Interval
+from ..value_objects.ohlcv_natural_key import compute_natural_key
 from ..value_objects.source import Source
 
 def _base_meta(ticker: str, period_start: datetime, loaded_at: datetime) -> dict:
@@ -24,9 +25,13 @@ class OHLCV:
     interval: Interval
     source: Source
     currency: Currency
-    loaded_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    loaded_at: datetime
     volume: Optional[Decimal] = None
     adjusted_close_price: Optional[Decimal] = None
+
+    @property
+    def natural_key(self):
+        return compute_natural_key(self.ticker, self.interval.value, self.period_start)
 
     def __post_init__(self):
         self._validate_types()
@@ -37,11 +42,7 @@ class OHLCV:
         """Equality key = (ticker, period_start, interval)"""
         if not isinstance(other, OHLCV):
             return NotImplemented
-        return (
-            self.ticker == other.ticker
-            and self.period_start == other.period_start
-            and self.interval == other.interval
-            )
+        return (self.natural_key == other.natural_key)
 
     def __lt__(self, other: object) -> bool:
         """It only for same ticker. Order by period_start."""
