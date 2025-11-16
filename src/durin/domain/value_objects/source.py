@@ -7,3 +7,10 @@ class Source(Enum):
     TWITTER = "Twitter"
     NEWSAPI = "NewsAPI"
     OCR = "OCR"
+
+    @classmethod
+    def from_str_to_enum(cls, value: str):
+        try:
+            return cls(value)
+        except ValueError:
+            return None

@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from unittest.mock import Mock
-import copy, pytest
+import pytest
 
 from durin.application import (
     ApplicationException,
@@ -19,7 +19,7 @@ from durin.domain import (
 @pytest.fixture
 def _valid_input_data_fields() -> ExtractOHLCVInputData:
     start = datetime(2025, 1, 1, 9, 30, tzinfo=timezone.utc)
-    end = datetime(2024, 12, 31, 9, 30, tzinfo=timezone.utc)
+    end = datetime(2025, 12, 31, 9, 30, tzinfo=timezone.utc)
     return dict(
         source="Yahoo",
         ticker="AAPL",
@@ -65,27 +65,27 @@ def test_execute__when_valid_input__then_returns_OHLCV_list(_valid_input_data_fi
 def test_execute__when_invalid_source__then_raises_ApplicationException(_valid_input_data_fields):
     args = _valid_input_data_fields.copy()
     args["source"] = "WrongSource"
-    input_data = ExtractOHLCVInputData(**args)
 
     provider_factory_mock = Mock()
-    provider_factory_mock.create.side_effect = ApplicationException("Unknown provider.", meta={"source": input_data.source})
+    provider_factory_mock.create.side_effect = ApplicationException("Unknown provider.")
 
     extractor = ExtractOHLCVUseCaseImpl(provider_factory_mock)
     with pytest.raises(ApplicationException):
+        input_data = ExtractOHLCVInputData(**args)
         extractor.execute(input_data)
 
 def test_execute__when_invalid_provider_input__then_raises_ApplicationException(_valid_input_data_fields):
     args = _valid_input_data_fields.copy()
     args["ticker"] = "WrongTicker"
-    input_data = ExtractOHLCVInputData(**args)
 
     provider_mock = Mock()
-    provider_mock.fetch.side_effect = ApplicationException("Yahoo finance service is unreachable or in error.", meta={"ticker": input_data.ticker, "start": input_data.start, "end": input_data.end, "interval": input_data.interval, "exception": ApplicationException("Mother exception")})
+    provider_mock.fetch.side_effect = ApplicationException("Yahoo finance service is unreachable or in error.")
     provider_factory_mock = Mock()
     provider_factory_mock.create.return_value = provider_mock
 
     extractor = ExtractOHLCVUseCaseImpl(provider_factory_mock)
     with pytest.raises(ApplicationException):
+        input_data = ExtractOHLCVInputData(**args)
         extractor.execute(input_data)
 
 def test_execute__when_unknown_error__then_raises_ApplicationException(_valid_input_data_fields):

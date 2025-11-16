@@ -2,5 +2,5 @@ from enum import Enum
 
 class PipelineStepType(Enum):
     EXTRACTOR = "Extractor"
-    TRASNFORMER = "Transformer"
+    TRANSFORMER = "Transformer"
     LOADER = "Loader"

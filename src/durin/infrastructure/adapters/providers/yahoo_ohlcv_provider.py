@@ -15,18 +15,6 @@ from ...exceptions.infrastructure_exceptions import InfrastructureException
 from durin.config.logger import logger
 from durin.domain import Currency, Interval, OHLCV, Source
 
-def _validate_inputs(ticker: str, start: datetime, end: datetime, interval: str) -> None:
-    if not isinstance(ticker, str) or not ticker.strip():
-        raise InfrastructureException("ticker input must be a non-empty string.", meta={"ticker": ticker})
-    if not isinstance(start, datetime) or not isinstance(end, datetime):
-        raise InfrastructureException("start and end inputs must be datetime instances.", meta={"ticker": ticker, "start": start, "end": end})
-    if start.tzinfo is None or end.tzinfo is None:
-        raise InfrastructureException("start and end inputs must be timezone-aware datetimes.", meta={"ticker": ticker, "start": start, "end": end})
-    if start >= end:
-        raise InfrastructureException("start input must be earlier than end input.", meta={"ticker": ticker, "start": start, "end": end})
-    if not Interval.from_str_to_enum(interval):
-        raise InfrastructureException(f"interval input {interval} not supported by YFinance.")
-
 def _to_decimal(value: Any) -> Decimal:
     if pd.isna(value):
         raise InfrastructureException("Value is NaN.")
@@ -49,7 +37,6 @@ class YahooOHLCVProvider:
 
     def fetch(self, ticker: str, start: datetime, end: datetime, interval: str, params: Optional[Mapping[str, Any]] = None) -> Iterable[OHLCV]:
         try:
-            _validate_inputs(ticker, start, end, interval)
             for raw_row in self._call_yfinance(ticker, start, end, interval, adjust_price=False):
                 try:
                     ohlcv = self._from_raw_to_entities(raw_row, ticker, interval)
