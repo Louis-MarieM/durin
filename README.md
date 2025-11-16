@@ -1,5 +1,5 @@
 # Durin
-Durin is a batch ETL for collecting financial, economic and text data.
+Durin is a batch ETL pipeline for collecting financial, economic and text data with a focus on clean architecture.
 
 ## Installation and run
 ### Prerequisites to installation
@@ -74,15 +74,33 @@ If you are using VSCode as IDE :
     ```
 When you runned Durin or tests in debug mode, then run this configuration in `RUN AND DEBUG` section of VSCode to attach a client to container and trigger breakpoints.
 
-## Logs
-Durin's logs are configured in [`logger.py`](/src/durin/config/logger.py)
+## Durin configuration
+### Environment variables
+Configuration is managed through [`.env`](/config/.env.example) files in the [`config/`](/config) directory.
+
+| Variable      | Description                                       | Default   | Values                                    |
+| :---          |:---                                               |:---       |:---                                       |
+| `VERSION`     | Application version (to update at each merge)     | `0.2.0`   |Current version                            |
+| `LOG_LEVEL`   | Logging verbosity of every module                 |`INFO`     |`DEBUG``INFO``WARNING``ERROR``CRITICAL`    |
+
+### Logging configuration
+Durin's logs are configured in [`logger.py`](/src/durin/config/logger.py).
+
+- **Format**: %(asctime)s - %(name)s - %(levelname)s - %(module)s.%(funcName)s [line %(lineno)d] - %(message)s
+- **Handler**: StreamHandler (console output)
+- **Level**: Controlled by LOG_LEVEL environment variable
 
 Tests's logs are locked by default. There are configured with theses options :
 ```
 -o log_cli=true -o log_cli_level=DEBUG
 ```
 
-## Durin configuration
-#### .env
-- `VERSION` : to update at each merge.
-- `LOG_LEVEL` : log level of every module.
+</br>
+
+---
+
+</br>
+
+**Version**: 0.2.0</br>
+**Format**: November 2025</br>
+**Maintainer**: Louis-Marie M.
