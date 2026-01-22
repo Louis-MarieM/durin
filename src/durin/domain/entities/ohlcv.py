@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from ..exceptions.domain_exceptions import ValidationException, InvalidOHLCVException
+from ..exceptions.domain_exceptions import InvalidOHLCVException, ValidationException
 from ..value_objects.currency import Currency
 from ..value_objects.interval import Interval
 from ..value_objects.ohlcv_natural_key import compute_natural_key
@@ -30,7 +30,7 @@ class OHLCV:
     adjusted_close_price: Optional[Decimal] = None
 
     @property
-    def natural_key(self):
+    def natural_key(self) -> str:
         return compute_natural_key(self.ticker, self.interval.value, self.period_start)
 
     def __post_init__(self):
